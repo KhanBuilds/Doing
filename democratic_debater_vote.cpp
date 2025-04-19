@@ -5,6 +5,9 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
+#include <fstream>
+#include <chrono>
+
 using namespace std;
 
 int K = 32;
@@ -18,6 +21,18 @@ double expectedscore(int playerrating, int opponentrating){
 int updatescore(int currentrating, int opponentrating, double score, int K){
 	double expectedScore = expectedscore(currentrating, opponentrating);
     return currentrating + K * (score - expectedScore);
+}
+
+string getCurrentTimestamp() {
+    // Get current time
+    auto now = chrono::system_clock::now();
+    time_t now_time = chrono::system_clock::to_time_t(now);
+
+    // Convert to readable format
+    char buffer[100];
+    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localtime(&now_time));
+    
+    return string(buffer);
 }
 
 void simulateMatch(vector<string>& debaters, unordered_map<string, int>& debaterRatings, unordered_map<string, int>& wins, unordered_map<string, int>& losses, int K){
@@ -77,11 +92,31 @@ void simulateMatch(vector<string>& debaters, unordered_map<string, int>& debater
 	cout << "Rating of " <<debaters[index1] << " after the match is: " << debaterRatings[debater1]<<endl;
 	cout << "Rating of " <<debaters[index2] << " after the match is: " << debaterRatings[debater2]<<endl;
 	
-	cout<< "LEADER BOARD: "<<endl;
+    
+    //Adding some janky file handling because I just wanted to, Ik there are some issues with it I'll fix them tho dont worry
+    //This opens/creates the file if it doesnt exist
+    ofstream outFile("Leaderboard.txt", ios::app);
+    
+    //This checks if the file is open 
+    if (outFile.is_open()){
+    	outFile <<endl;
+    	outFile <<endl;
+    //Adding a timestamp to clarify which leaderboard is the latest 
+    
+    string timestamp = getCurrentTimestamp();
+
+    	
+    //This then writes a Leaderboard with the updated scores and stuff
+	outFile<< "LEADER BOARD: " <<"[" << timestamp << "]"<<endl;
 	for (int i = 0; i < debaters.size(); i++){
 		string name = debaters[i];
-		cout << "Debater: "<<name<< " Wins: "<<wins[name]<< " "<<"Losses: "<<losses[name]<<endl;
+		outFile<< "Debater: "<<name<< " Wins: "<<wins[name]<< " "<<"Losses: "<<losses[name]<<endl;
 	
+}
+   //This closes the file after writing
+   outFile.close();
+} else{
+	cout << "Error opening the file for writing"<<endl;
 }
 }
 
