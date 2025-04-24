@@ -49,10 +49,37 @@ private:
     }
 
 public:
-    void addDebater(const string& name, int rating = 1000) {
+   void askAndAddDebater(int rating = 1000) {
+    string name;
+    char choice;
+
+    cout << "Do you want to add a new debater? (y/n): ";
+    cin >> choice;
+
+    if (choice == 'y' || choice == 'Y') {
+        cout << "Enter debater's name: ";
+        cin >> ws; // this right here..... clears spaces haha
+        getline(cin, name);
+
+        cout << "Enter debater's rating (or -1 for default): ";
+        cin >> rating;
+
+        if (rating == -1) rating = 1000;
+
         debaters[name] = Debater(name, rating);
         names.push_back(name);
+
+        cout << "Debater '" << name << "' added with rating " << rating << ".\n";
+    } else {
+        cout << "No debater added.\n";
     }
+}
+
+	 void addDebater(const string& name, int rating = 1000) {
+        debaters[name] = Debater(name, rating);
+        names.push_back(name);
+    }   
+
 
     void loadPreviousStats() {
         ifstream inFile(filename);
@@ -172,6 +199,7 @@ int main() {
     lb.loadPreviousStats();
     lb.displayLeaderboard();
     lb.simulateMatch();
+    lb.askAndAddDebater();
 
     return 0;
 }
